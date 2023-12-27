@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Login</title>
+    </head>
+
+    <body>
+        <h2>Welcome to the Polls application!</h2>
+        <h3>Login</h3>
+        <form action="/polls/" method="POST">
+            <!--{% csrf_token %}-->
+            {{ form.as_p }}
+            <button type="submit">Login</button>
+        </form>
+    </body>
+</html>
