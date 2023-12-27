@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Poll application</title>
+        <title>Home</title>
     </head>
 
     <body>
@@ -11,7 +11,7 @@
             {% if latest_question_list %}
                 <ul>
                 {% for question in latest_question_list %}
-                    <li><a href="{% url 'polls:detail' question.id %}">
+                    <li><a href="{% url 'detail' question.id %}">
                         {{ question.question_text }}
                     </a></li>
                 {% endfor %}
@@ -20,5 +20,28 @@
                 <p>No polls are available.</p>
             {% endif %}
         </div>
+        <br>
+        <div>
+            <h2>Add question</h2>
+            <form action="{% url 'addquestion' %}" method="GET">
+                <!--{% csrf_token %}-->
+                {{ form.as_p }}
+                <label for="q">Question:</label><br>
+                <input type="text" name="q"><br>
+                <label for="c1">Choice 1:</label><br>
+                <input type="text" name="c1"><br>
+                <label for="c2">Choice 2:</label><br>
+                <input type="text" name="c2"><br>
+                <input type="submit" value="Add"><br>
+            </form>
+        </div>
+        <br>
+        <div>
+            <h3>Logout</h3>
+            <form action="{% url 'logout' %}" method="POST">
+                <!--{% csrf_token %}-->
+                <input type="submit" value="Logout"/>
+            </form>
+          </div>
     </body>
 </html>
