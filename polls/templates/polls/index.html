@@ -6,8 +6,9 @@
     </head>
 
     <body>
+        <h1>Polls application</h1>
         <div>
-            <h1>Questions</h1>
+            <h2>Questions</h2>
             {% if latest_question_list %}
                 <ul>
                 {% for question in latest_question_list %}
@@ -20,11 +21,10 @@
                 <p>No polls are available.</p>
             {% endif %}
         </div>
-        <br>
         <div>
-            <h2>Add question</h2>
-            <form action="{% url 'addquestion' %}" method="GET">
-                <!--{% csrf_token %}-->
+            <h2>Add a question</h2>
+            <form action="{% url 'addquestion' %}" method="GET"> <!--Fix 2: Change GET to POST-->
+                <!--{% csrf_token %}--> <!--Fix 1: Uncomment this token-->
                 {{ form.as_p }}
                 <label for="q">Question:</label><br>
                 <input type="text" name="q"><br>
@@ -36,12 +36,17 @@
             </form>
         </div>
         <br>
+        <br>
         <div>
-            <h3>Logout</h3>
-            <form action="{% url 'logout' %}" method="POST">
-                <!--{% csrf_token %}-->
-                <input type="submit" value="Logout"/>
+            <h2>Account</h2>
+            <table>
+                <th style="text-align:left">Username:
+                <td>{{user.username}}
+            </table>
+            <form action='logout/' method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Logout" />
             </form>
-          </div>
+        </div>
     </body>
 </html>

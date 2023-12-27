@@ -1,20 +1,14 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django import forms
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 
 from .models import Choice, Question
 
-def logout(request):
-    logout(request)
-    return redirect('login')
-
-def login(request):
-    return render(request, 'polls/login.html')
-
+@login_required
 def index(request):
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
     context = {'latest_question_list': latest_question_list}
@@ -33,22 +27,19 @@ class AddQuestionForm(forms.Form):
     choice1 = forms.CharField(max_length=200)
     choice2 = forms.CharField(max_length=200)
 
-@csrf_exempt # 1. Remove decorator, uncomment csrf-middleware in settings.py and uncomment csrf-token in index.html
+@csrf_exempt #Fix 1: Remove this decorator
 def addquestion(request):
-    #if request.method == 'POST':
-        #form = AddQuestionForm(request.POST)
-        #if form.is_valid():
-    question = request.GET.get("q")
-    choice1 = request.GET.get("c1")
-    choice2 = request.GET.get("c2")
+    if request.method == "GET":         #Fix 2: Change GET to POST
+        question = request.GET.get("q") #Fix 2: Change GET to POST
+        choice1 = request.GET.get("c1") #Fix 2: Change GET to POST
+        choice2 = request.GET.get("c2") #Fix 2: Change GET to POST
 
-    q = Question(question_text=question, pub_date=datetime.now())
-    q.save()
-    q.choice_set.create(choice_text=choice1, votes=0)
-    q.choice_set.create(choice_text=choice2, votes=0)
-    q.save()
-    form = AddQuestionForm()
-    return HttpResponseRedirect(reverse('index'))
+        q = Question(question_text=question, pub_date=datetime.now())
+        q.save()
+        q.choice_set.create(choice_text=choice1, votes=0)
+        q.choice_set.create(choice_text=choice2, votes=0)
+        q.save()
+        return HttpResponseRedirect(reverse('index'))
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
