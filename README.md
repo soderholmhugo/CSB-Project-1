@@ -3,7 +3,7 @@ The task for this project was to build a web application with at least five diff
 
 ### Run the project (on Windows):
 
-The app is made using Python and Django. Therefore, to run the app, you should first follow the [installation guide]() used in this course to install all the required libraries and dependencies.
+The app is made using Python and Django. Therefore, to run the app, you should first follow the [installation guide](https://cybersecuritybase.mooc.fi/installation-guide) used in this course to install all the required libraries and dependencies.
 
 After doing that, open a command prompt and clone this repository by entering the following command:
 ```
