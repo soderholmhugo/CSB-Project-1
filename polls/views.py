@@ -78,7 +78,7 @@ def vote(request, question_id):
         return HttpResponseRedirect(reverse('results', args=(question.id,)))
 
 @login_required
-def givefeedback(request):
+def givefeedback(request): #Fix 5: Reverse the commenting on this function
     '''if request.method == 'POST':
         text = request.POST.get('text')
         Feedback.objects.create(user=request.user, text=text)'''
@@ -87,4 +87,5 @@ def givefeedback(request):
     text = request.POST.get('text') 
     cursor.execute("INSERT INTO polls_feedback (text, user_id) VALUES ('%s',%d)" % (text,request.user.id))
     conn.commit()
+
     return HttpResponseRedirect(reverse('index'))
