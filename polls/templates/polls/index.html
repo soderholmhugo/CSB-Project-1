@@ -35,12 +35,31 @@
                 <input type="submit" value="Add"><br>
             </form>
         </div>
-        <br>
-        <br>
+        <div>
+            {% if superuser %}
+                <h2>Feedback</h2>
+                {% if feedback %}
+                    <ul>
+                    {% for f in feedback %}
+                        <strong>{{ f.user.username }}:</strong> {{ f.text }}<br>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No feedback has been received yet.</p>
+                {% endif %}
+            {% else %}
+                <h2>Give feedback</h2>
+                <form action="{% url 'givefeedback' %}" method="post">
+                    {% csrf_token %}
+                    <textarea name="text" placeholder="Write feedback here"></textarea><br>
+                    <input type="submit" value="Send">
+                </form>
+            {% endif %}
+        </div>
         <div>
             <h2>Account</h2>
             <table>
-                <th style="text-align:left">Username:
+                <th style="text-align:left">User:
                 <td>{{user.username}}
             </table>
             <form action='logout/' method="POST">

@@ -5,13 +5,27 @@ from django import forms
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from .models import Feedback
+import sqlite3
 
 from .models import Choice, Question
 
 @login_required
 def index(request):
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    context = {'latest_question_list': latest_question_list}
+
+    superuser = request.user.is_staff
+    if superuser:
+        feedback = Feedback.objects.select_related('user').all()
+    else:
+        feedback = None
+
+    context = {
+        'latest_question_list': latest_question_list,
+        'feedback': feedback,
+        'superuser': superuser,
+        }
+
     return render(request, 'polls/index.html', context)
 
 #@login_required
@@ -62,3 +76,15 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse('results', args=(question.id,)))
+
+@login_required
+def givefeedback(request):
+    '''if request.method == 'POST':
+        text = request.POST.get('text')
+        Feedback.objects.create(user=request.user, text=text)'''
+    conn = sqlite3.connect("db.sqlite3")
+    cursor = conn.cursor()
+    text = request.POST.get('text') 
+    cursor.execute("INSERT INTO polls_feedback (text, user_id) VALUES ('%s',%d)" % (text,request.user.id))
+    conn.commit()
+    return HttpResponseRedirect(reverse('index'))
