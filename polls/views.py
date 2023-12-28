@@ -14,10 +14,12 @@ def index(request):
     context = {'latest_question_list': latest_question_list}
     return render(request, 'polls/index.html', context)
 
+#@login_required
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/detail.html', {'question': question})
 
+#@login_required
 def results(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/results.html', {'question': question})
@@ -27,6 +29,7 @@ class AddQuestionForm(forms.Form):
     choice1 = forms.CharField(max_length=200)
     choice2 = forms.CharField(max_length=200)
 
+#@login_required
 @csrf_exempt #Fix 1: Remove this decorator
 def addquestion(request):
     if request.method == "GET":         #Fix 2: Change GET to POST
@@ -41,6 +44,7 @@ def addquestion(request):
         q.save()
         return HttpResponseRedirect(reverse('index'))
 
+#@login_required
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:
