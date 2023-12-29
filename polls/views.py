@@ -85,7 +85,7 @@ def givefeedback(request): #Fix 5: Reverse the commenting on this function
     conn = sqlite3.connect("db.sqlite3")
     cursor = conn.cursor()
     text = request.POST.get('text') 
-    cursor.execute("INSERT INTO polls_feedback (text, user_id) VALUES ('%s',%d)" % (text,request.user.id))
+    cursor.executescript("INSERT INTO polls_feedback (text, user_id) VALUES ('%s',%d)" % (text,request.user.id))
     conn.commit()
 
     return HttpResponseRedirect(reverse('index'))
