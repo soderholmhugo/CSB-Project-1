@@ -38,8 +38,8 @@ Next up, I will locate each and every flaw in the code, describe them and provid
 ## Flaw 1: [CSRF](https://cybersecuritybase.mooc.fi/module-2.3/1-security)
 **Source links:**
 - CSRF token: https://github.com/Dravde01/CSB-Project-1/blob/master/polls/templates/polls/index.html#L27
-- Exempt decorator: https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L33
-- SameSite cookies: https://github.com/Dravde01/CSB-Project-1/blob/master/csb_project_1/settings.py#L132
+- Exempt decorator: https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L47
+- SameSite cookies: https://github.com/Dravde01/CSB-Project-1/blob/master/csb_project_1/settings.py#L133
 
 **Description:**  
 CSRF stands for Cross-Site Request Forgery and is a fundamental flaw that, fortunately, is not so common nowadays due to more secure web frameworks. It allows users to send unauthorized web requests to a website through another site where the user is authenticated. A common example is if someone opens a web browser and logs into a CSRF-vulnerable website with their credentials. If the user opens another tab with a site containing a malicious hidden request (e.g. through a form submission), and triggers the request, then this malicious request can be performed on the website where the user is already logged in. This way, personal data from the site where the user is logged in can be accessed and stolen by the attacker performing the request.
@@ -53,13 +53,13 @@ The fixes here are simple. First, go to the linked line in the *index.html* file
 **Source links:**  
 GET requests:
 - https://github.com/Dravde01/CSB-Project-1/blob/master/polls/templates/polls/index.html#L26
-- https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L35-L38
+- https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L49-L52
 
 Login decorators:
-1. https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L17
-2. https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L22
-3. https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L32
-4. https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L47
+1. https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L31
+2. https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L36
+3. https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L46
+4. https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L61
 
 **Description:**  
 Broken Access Control encapsules everything regarding improper setup of user access control mechanisms. This often means that users have access to do things they should not be allowed to (e.g. viewing sensitive data or performing administrative actions), which inherently causes security concerns. However, other things like weak passwords and an overall weak authentication policy are also sometimes included under Broken Access Control. In web applications, data is sometimes stored in path variables which can be modified to give certain users access to that data.
@@ -88,8 +88,8 @@ These are just the fixes for the problems that I mentioned. Keep in mind that th
 
 ## Flaw 4: [Identification and Authentication Failures](https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/)
 **Source links:**
-- Password validators: https://github.com/Dravde01/CSB-Project-1/blob/master/csb_project_1/settings.py#L88-L104
-- Secure session cookies: https://github.com/Dravde01/CSB-Project-1/blob/master/csb_project_1/settings.py#L106
+- Password validators: https://github.com/Dravde01/CSB-Project-1/blob/master/csb_project_1/settings.py#L88-L105
+- Secure session cookies: https://github.com/Dravde01/CSB-Project-1/blob/master/csb_project_1/settings.py#L107
 
 **Description:**  
 In my opinion, the name of this flaw is slightly misleading. Basically, it refers to security issues surfacing as a result of inadequate authentication and verification of user identity in, specifically, business applications. A common and good protection tool here is issuing each logged-in user a session ID to keep track of them and ensure that attackers don't try to impersonate them. These are by default implemented in Django applications and, essentially, temporarily replace the users actual login credentials in favor of a more secure identification method. A hacker can easily get and use anyone's credentials through brute force, if they are weak enough. Therefore, weak password policies are also included in this flaw.
@@ -104,12 +104,30 @@ To fix these problems, simply uncomment the linked lines in *settings.py* to ena
 4. can't consist of only numbers.
 To increase the security further, navigate to http://127.0.0.1:8000/admin/ when the server is running and change the password of, atleast, the important superuser according to the new guidelines.
 
-## Flaw 5: []()
+## Flaw 5: [Injection](https://owasp.org/Top10/A03_2021-Injection/)
 **Source links:**
-- ...
+- Injection vulnerable code: https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L85-L89
+- Fixed function: https://github.com/Dravde01/CSB-Project-1/blob/master/polls/views.py#L82-L84
 
 **Description:**  
-...
+Injection is a technique where attackers inject malicious data through an unsanitized data input field in an application. The data is interpreted as part of a command or query which is then executed by the application, possibly giving the attacker unauthorized access to the data. The most well-known injection method is called SQL injection, which is where an attacker inserts a malicious SQL query into a input field to manipulate the backend database and give the attacker access to some form of the data stored on there. To protect against this, programmer's should properly sanitize input fields or use other injection-safe methods in the code if possible.
+
+In my application, SQL injection is possible due to the input field for giving feedback being improperly sanitized. For example, if you log in as the user admin and write `',1); DELETE FROM polls_feedback; INSERT INTO polls_feedback (text, user_id) VALUES ('you have been hacked',1) --` into the input field for giving feedback, then all the content of the table will be deleted and there will only be one input saying "you have been hacked". An even worse case is if you enter `',1); DROP TABLE polls_feedback; --`. This text input will completely break the application and make it impossible for the superuser to log in to the website without reverting the database changes.
 
 **Fix:**  
-...
+To fix this very serious flaw, reverse the commenting of the linked lines in *views.py* at the definition of "givefeedback". What I mean by that is, comment the lines 85-89 and comment out the lines 82-84. This will change the function so that it uses Django's standard way of creating objects with models instead of using a SQL query INSERT INTO. This way, the input field will be completely safe from any injection attempts.
+
+### Conclusion:
+To summarize, I have created a backend web application using Python and Django templates. This application has five different security flaws from the 2021 version of the [OWASP top ten list](https://owasp.org/www-project-top-ten/), including CSRF. The five flaws in my application include:
+1. [CSRF](https://cybersecuritybase.mooc.fi/module-2.3/1-security)
+2. [Broken Access Control](https://owasp.org/Top10/A01_2021-Broken_Access_Control/)
+3. [Security Misconfiguration](https://owasp.org/Top10/A05_2021-Security_Misconfiguration/)
+4. [Identification and Authentication Failures](https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/)
+5. [Injection](https://owasp.org/Top10/A03_2021-Injection/)
+
+In this *README.md* file, I have described each and every one of these flaws, explained how they are present and affect my application and provided specific solutions to fix all of them in my application.
+
+This was the first course project as part of the [Cyber Security Base 2023](https://cybersecuritybase.mooc.fi/) MOOC course provided by [Helsinging yliopisto](https://www.helsinki.fi/en).
+
+Overall, it was a very fun and interesting challenge that I learned a lot from.  
+Thanks for this opportunity and enjoy my project!
